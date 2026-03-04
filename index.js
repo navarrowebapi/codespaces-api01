@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const pool = require('./db');
 
 // enable CORS for all routes so Swagger UI can talk to the API from any origin
 app.use(cors());
@@ -96,11 +97,22 @@ app.get('/', (req, res) => {
   res.json({ message: 'API is running' });
 });
 
-app.post('/data', (req, res) => {
-  const payload = req.body;
-  console.log('Received payload:', payload);
-  // You could add validation or storage logic here
-  res.json({ status: 'ok' });
+app.post('/data', async (req, res) => {
+  const { device_id, timestamp, Temperatura, Umidade } = req.body;
+
+  try {
+    await pool.query(
+      `INSERT INTO sensor_data (time, device_id, temperatura, umidade)
+       VALUES (to_timestamp($1), $2, $3, $4)`,
+      [timestamp, device_id, Temperatura, Umidade]
+    );
+
+    res.json({ status: 'stored' });
+
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'database error' });
+  }
 });
 
 app.listen(port, () => {
