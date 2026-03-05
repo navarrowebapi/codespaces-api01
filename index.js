@@ -101,16 +101,15 @@ app.post('/data', async (req, res) => {
   const { device_id, timestamp, Temperatura, Umidade } = req.body;
 
   try {
-    await pool.query(
-      `INSERT INTO sensor_data (time, device_id, temperatura, umidade)
-       VALUES (to_timestamp($1), $2, $3, $4)`,
-      [timestamp, device_id, Temperatura, Umidade]
-    );
+
+    console.log('Received data:', { device_id, timestamp, Temperatura, Umidade });
+    await pool.query('INSERT INTO sensor_data (time, device_id, temperatura, umidade) VALUES (to_timestamp($1 / 1000.0), $2, $3, $4)', [timestamp, device_id, Temperatura, Umidade]);
 
     res.json({ status: 'stored' });
 
   } catch (error) {
     console.error('Database error:', error);
+    console.error('ERRO DETALHADO:', error.message, error.stack);
     res.status(500).json({ error: 'database error' });
   }
 });

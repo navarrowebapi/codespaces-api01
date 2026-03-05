@@ -1,7 +1,7 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  host: 'timescaledb',   // nome do serviço no docker-compose
+  host: 'localhost',  
   user: 'postgres',
   password: 'postgres',
   database: 'sensores',
